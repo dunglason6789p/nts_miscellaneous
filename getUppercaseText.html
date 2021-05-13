@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script>
+/*const REGEX_AZ09dot_ = /('[A-Z0-9_.]+?'|"[A-Z0-9_.]+?")/g;
+function findAll_AZ09dot_(text) {
+  const matchResultList = text.matchAll(REGEX_AZ09dot_);
+  for (const matchResult of matchResultList) {
+    console.log(matchResult);
+  }
+}*/
+const REGEX_AZ09dot_ = /'[A-Z0-9_.]+?'|"[A-Z0-9_.]+?"/g;
+function findAll_AZ09dot_(text) {
+  const matchResultList = text.matchAll(REGEX_AZ09dot_);
+  for (const matchResult of matchResultList) {
+    console.log(matchResult[0]);
+  }
+}
+  </script>
+</head>
+<body>
+
+</body>
+</html>

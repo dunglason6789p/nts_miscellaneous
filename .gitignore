@@ -1,0 +1,9 @@
+/node_modules
+
+/.idea
+*.iml
+
+package-lock.json
+
+ja.json
+en.json

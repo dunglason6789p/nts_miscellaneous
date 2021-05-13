@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="jsonpath-plus.js"></script>
+  <script>
+let JA_JSON_OBJ = null;
+let JA_JSON_STR = null;
+window.onload = async () => {
+  try {
+    const response = await fetch('./ja.json');
+    //console.log(response);
+    JA_JSON_OBJ = await response.json();
+    //console.log(JA_JSON_OBJ);
+    JA_JSON_STR = JSON.stringify(JA_JSON_OBJ);
+  } catch (e) {
+    console.error(e);
+  }
+  document.querySelector('#elmId_mainTextArea').onkeydown = event => {
+    if (event.ctrlKey && event.which === 13) {
+      execute();
+    }
+  }
+}
+function execute() {
+  console.clear();
+
+  const textAreaElement = document.querySelector('#elmId_mainTextArea');
+  const input = textAreaElement.value;
+
+  const regexSearchResultList = findAll_AZ09dot_(input);
+  const totalResultStrList = [];
+  for (const regexSearchResult of regexSearchResultList) {
+    const results = findValueByPath(regexSearchResult);
+    totalResultStrList.push(...results);
+  }
+  const totalResultStrListProcessed = distinct(filterNullOrEmpty(totalResultStrList));
+  const finalMessage = `Click button ${totalResultStrListProcessed.join(' hoặc ')}`;
+  console.log(finalMessage);
+  const inputForClipboard = document.querySelector('#elmId_inputForClipboard');
+  inputForClipboard.value = finalMessage;
+  inputForClipboard.select();
+  document.execCommand('copy');
+}
+function findValueByPath(path) {
+  try {
+    path = path.replaceAll('"','').replaceAll('\'','');
+    const pathExpression = `$..${path}`;
+    console.log(pathExpression);
+    const result = JSONPath.JSONPath({path: pathExpression, json: JA_JSON_OBJ});
+    if (result.length < 2) {
+      console.log(result[0]);
+    } else {
+      console.log(result);
+    }
+    return result.filter(it=>it);
+  } catch (e) {
+    console.error(e);
+    //alert(e);
+    return [];
+  }
+}
+const REGEX_AZ09dot_ = /'[A-Z0-9_.]+?'|"[A-Z0-9_.]+?"/g;
+function findAll_AZ09dot_(text) {
+  const returnValue = [];
+  const matchResultList = text.matchAll(REGEX_AZ09dot_);
+  for (const matchResult of matchResultList) {
+    const matchResultText = matchResult[0];
+    if (matchResultText && typeof matchResultText === 'string') {
+      returnValue.push(matchResultText);
+    }
+  }
+  return returnValue;
+}
+
+function distinct(array) {
+  const newArray = [];
+  for (const item of array) {
+    if (newArray.indexOf(item) < 0) {
+      newArray.push(item);
+    }
+  }
+  return newArray;
+}
+function filterNullOrEmpty(array) {
+  return array.filter(it=>it);
+}
+
+function test_JSONPath(path, customJson) {
+  const result = JSONPath.JSONPath({path, json: customJson || JA_JSON_OBJ});
+  console.log(result);
+}
+  </script>
+</head>
+<body>
+<textarea id="elmId_mainTextArea" autofocus style="width: 800px; height: 300px;"></textarea>
+<div>
+  <button onclick="execute()">Exec</button>
+</div>
+<div>
+  <input id="elmId_inputForClipboard" style="width: 50px; position: absolute; top: 2000px">
+</div>
+</body>
+</html>
